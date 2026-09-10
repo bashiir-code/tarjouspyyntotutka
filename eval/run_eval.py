@@ -43,10 +43,13 @@ def retrieval(k: int = 10) -> dict:
     return {"metrics": report, "misses": misses}
 
 
-def groundedness() -> dict:
+def groundedness(backend: str = "foundry") -> dict:
     """Citation validity: every [HILMA id] the agent cites must exist and must have been retrieved by a
     tool in that same run (no citing from memory). Stated deadlines must match the cited notice."""
-    from hilma.agent import run
+    if backend == "foundry":
+        from hilma.foundry_agent import run
+    else:
+        from hilma.agent import run
 
     rows = [json.loads(line) for line in (HERE / "agent.jsonl").read_text().splitlines() if line.strip()]
     results = []
@@ -94,11 +97,13 @@ def groundedness() -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--agent", action="store_true")
+    ap.add_argument("--backend", choices=["foundry", "local"], default="foundry")
     ap.add_argument("--min-recall", type=float, default=None)
     args = ap.parse_args()
     report = {"retrieval": retrieval()}
     if args.agent:
-        report["agent"] = groundedness()
+        report["agent"] = groundedness(args.backend)
+        report["agent"]["backend"] = args.backend
     (HERE / "results.json").write_text(json.dumps(report, ensure_ascii=False, indent=1))
     if args.min_recall is not None and report["retrieval"]["metrics"]["semantic"]["recall@5"] < args.min_recall:
         print(f"FAIL: semantic recall@5 below {args.min_recall}")

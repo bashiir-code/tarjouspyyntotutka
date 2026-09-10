@@ -15,7 +15,14 @@ type Notice = {
 
 type Step = { tool: string; args: Record<string, unknown>; result_ids: string[] }
 
-type Turn = { question: string; answer?: string; trace?: Step[]; notices?: Notice[]; error?: string }
+type Turn = {
+  question: string
+  answer?: string
+  trace?: Step[]
+  notices?: Notice[]
+  conversation_id?: string
+  error?: string
+}
 
 const EXAMPLES = [
   'Onko viimeisen puolen vuoden aikana tullut Azure-osaamiseen liittyviä kilpailutuksia, joiden arvo on alle 500 000 €?',
@@ -55,6 +62,8 @@ export default function App() {
     if (!question.trim() || busy) return
     setBusy(true)
     setQ('')
+    // Foundry keeps the conversation server-side; the local backend needs the history resent.
+    const conversation_id = turns.findLast((t) => t.conversation_id)?.conversation_id
     const history = turns
       .filter((t) => t.answer)
       .flatMap((t) => [
@@ -66,7 +75,7 @@ export default function App() {
       const r = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, history }),
+        body: JSON.stringify({ question, history, conversation_id }),
       })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const data = await r.json()

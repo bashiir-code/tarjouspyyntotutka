@@ -9,7 +9,7 @@ Vastauksessa on jokaisesta ilmoituksesta otsikko, hankintayksikkö, arvo, määr
 ## Arkkitehtuuri
 
 ```
-HILMA AVP API ──ingest.py──► Azure AI Search (hilma-notices)  ◄── search.py ◄── agent.py (gpt-5-mini, tool calling)
+HILMA AVP API ──ingest.py──► Azure AI Search (hilma-notices)  ◄── search.py ◄── Foundry Agent Service (gpt-5-mini)
  eForms, 12 kk               BM25 fi.microsoft + vektori                          ├ search_notices
  ContractNotices             + semantic ranker                                    ├ get_notice
  CPV 72 / 48 / 794           + suodattimet: arvo, määräaika,                      └ assess_fit (profile.md)
@@ -22,7 +22,8 @@ HILMA AVP API ──ingest.py──► Azure AI Search (hilma-notices)  ◄─�
 | Nouto, suodatus, upotukset, indeksointi | [backend/hilma/ingest.py](backend/hilma/ingest.py) |
 | Indeksin skeema | [backend/hilma/index.py](backend/hilma/index.py) |
 | Hybridihaku ja suodattimet | [backend/hilma/search.py](backend/hilma/search.py) |
-| Agentti ja kolme työkalua | [backend/hilma/agent.py](backend/hilma/agent.py) |
+| Foundry-agentti (Entra ID, keskustelu palvelimella) | [backend/hilma/foundry_agent.py](backend/hilma/foundry_agent.py) |
+| Työkalut, kehote ja rajausten pakotus (myös paikallinen vertailuagentti) | [backend/hilma/agent.py](backend/hilma/agent.py) |
 | Kyvykkyysprofiili | [backend/hilma/profile.md](backend/hilma/profile.md) |
 | Evaluointi | [eval/](eval/) |
 | Infra | [infra/main.bicep](infra/main.bicep), [.github/workflows/ci.yml](.github/workflows/ci.yml) |
@@ -31,12 +32,23 @@ HILMA AVP API ──ingest.py──► Azure AI Search (hilma-notices)  ◄─�
 
 **CPV-suodatus etuliitteillä:** `cpv_codes`-kenttään tallennetaan täyden koodin lisäksi sen 2-, 3- ja 4-numeroiset etuliitteet. Näin agentti voi rajata esimerkiksi `cpv_codes/any(c: c eq '72')` ilman merkkijonovertailua.
 
+## Foundry Agent Service
+
+Agentti `tarjouspyyntotutka` on Foundry-projektissa prompt agent -tyyppinen agentti. Sen määritelmä on tallessa palvelimella: malli, ohjeet ja kolmen funktiotyökalun skeemat. Myös keskusteluhistoria säilyy palvelimella `conversation_id`:n takana. Backend suorittaa vain työkalut. Agentti käyttää Entra ID -tunnistautumista (`DefaultAzureCredential`): paikallisesti `az login`, Azuressa managed identity. API-avaimia ei tarvita, ja käyttäjällä pitää olla projektiin *Foundry User* -rooli.
+
+- Agentin määritelmä on koodissa. `python -m hilma.foundry_agent deploy` luo siitä uuden version, joten kehotteen muutokset kulkevat gitin kautta eivätkä jää portaalin käsin tehdyiksi muutoksiksi.
+- Ohjeet pidetään pysyvinä. Päivämäärä ja koodissa pakotetut rajaukset välitetään jokaisen pyynnön mukana.
+- Toteutus käyttää Foundryn REST- ja Responses-rajapintaa jo asennetuilla `openai`- ja `azure-identity`-paketeilla, joten erillistä `azure-ai-projects`-SDK:ta ei tarvita.
+- Asetuksella `AGENT_BACKEND=local` käyttöön tulee alkuperäinen Chat Completions -silmukka. Evaluoinnissa toteutuksia voi verrata valitsimella `--backend foundry|local`.
+
 ## Käynnistys
 
 ```bash
 cp .env.example .env         # täytä avaimet
 uv sync
+az login
 cd backend && uv run python -m hilma.index && uv run python -m hilma.ingest
+uv run python -m hilma.foundry_agent deploy
 uv run uvicorn hilma.api:app --port 8000
 cd ../frontend && npm install && npm run dev   # http://localhost:5173
 ```
@@ -68,25 +80,26 @@ Jokaisessa ajossa tarkistetaan kolme asiaa:
 - **Odotettu osuma:** tietty ilmoitus löytyy kysymykseen, jonka vastaus tiedetään.
 - **Rajausten noudattaminen:** yksikään viitattu ilmoitus, jonka arvo tiedetään, ei ylitä käyttäjän antamaa arvorajaa.
 
-| Mittari | Vain kehote | + kynnysarvo | + rajaukset koodissa |
-|---|---|---|---|
-| Viitteet olemassa ja haettu työkalulla | 1.00 | 1.00 | 1.00 |
-| Odotettu ilmoitus viitattu (Azure-kysymys) | 1.00 | 1.00 | 1.00 |
-| **Arvorajaa noudatettu** | – | 0.50 | **1.00** (lisäksi 3/3 toistoa) |
+| Mittari | Vain kehote | + kynnysarvo | + rajaukset koodissa | Foundry Agent Service |
+|---|---|---|---|---|
+| Viitteet olemassa ja haettu työkalulla | 1.00 | 1.00 | 1.00 | 1.00 |
+| Odotettu ilmoitus viitattu (Azure-kysymys) | 1.00 | 1.00 | 1.00 | 1.00 |
+| **Arvorajaa noudatettu** | – | 0.50 | **1.00** (lisäksi 3/3 toistoa) | **1.00** |
 
 ## Mikä ei toiminut ja mitä korjattiin
 
 1. **Vektorihaku palauttaa aina jotain.** Kysymykseen *"kvanttitietokoneiden ohjelmointi alle 5 000 €"* vektorihaku palautti neljä aiheeseen liittymätöntä ilmoitusta, koska k lähintä naapuria löytyy aina. Reranker-pisteiden tarkastelu näytti selvän eron: epärelevanttien osumien paras pistemäärä oli 1.47 ja oikeiden osumien huonoin 2.13. Agentin hakutyökalu pudottaa nyt tulokset, joiden reranker-pisteet jäävät alle 1.8. Evaluoinnin hakuvertailu ajetaan ilman kynnystä, jotta vertailu hakutapojen välillä pysyy reiluna.
 2. **Ensimmäinen testi mittasi väärää asiaa.** Oletin, ettei kvanttiaiheisia ilmoituksia ole, ja testasin, että vastauksessa ei ole viitteitä. Toistoissa agentti kuitenkin viittasi aitoon ilmoitukseen *LUMI-IQ Quantum Computing Platform*, jossa ei ole ilmoitettu arvoa. Se ei ole virhe. Varsinainen virhe oli toisaalla: samassa vastauksessa oli tietoturvatestaus, jonka arvo on 800 000 €. Testi mittaa nyt sitä, mikä oikeasti on väärin, eli rikkooko viitattu ilmoitus käyttäjän antamaa rajaa.
 3. **Rajaus kehotteessa ei ole takuu.** Kehotteeseen lisätty sääntö "rajaukset ovat ehdottomia" ei auttanut. Kun malli teki uusintahakuja, se jätti `max_value`-arvon pois. Nyt käyttäjän kysymyksestä poimitaan kerran rakenteiset rajat (`max_value`, `min_value`, `published_after`, `deadline_after`), ja koodi lisää ne jokaiseen hakukutsuun mallin antamien arvojen päälle. Tulos nousi 0.50:stä 1.00:aan.
-4. **Lähdelista oli liian laaja.** Aluksi käyttöliittymä näytti lähteinä kaikki noin 50 ilmoitusta, jotka agentti oli nähnyt. Nyt `sources` sisältää vain vastauksessa viitatut ilmoitukset, ja `retrieved` pitää kirjaa kaikesta nähdystä groundedness-tarkistusta varten.
-5. **Embedding-deployment ei vastannut.** `text-embedding-3-small` GlobalStandard-SKU:lla näkyi tilassa *Succeeded*, mutta palautti swedencentralissa 404 `DeploymentNotFound` vielä 20 minuutin jälkeen. Standard-SKU:ta ei ole tarjolla tällä alueella. DataZoneStandard toimi heti ja pitää käsittelyn EU:ssa, mikä on julkisen sektorin datalle muutenkin oikea valinta.
+4. **Kynnysarvolla on hintansa.** Pelkkä sana "Azure" ei läpäise reranker-kynnystä 1.8, koska yhden sanan kyselyt saavat matalat pisteet. Agentti löysi samat ilmoitukset pidemmillä hauilla, kuten "Azure pilvipalvelu", ja kehote ohjaa sitä kokeilemaan useaa muotoilua. Parempi ratkaisu olisi kyselyn pituudesta riippuva kynnys tai suhteellinen kynnys (esimerkiksi 60 % parhaan tuloksen pisteistä). Se vaatii lisää evaluointidataa.
+5. **Lähdelista oli liian laaja.** Aluksi käyttöliittymä näytti lähteinä kaikki noin 50 ilmoitusta, jotka agentti oli nähnyt. Nyt `sources` sisältää vain vastauksessa viitatut ilmoitukset, ja `retrieved` pitää kirjaa kaikesta nähdystä groundedness-tarkistusta varten.
+6. **Embedding-deployment ei vastannut.** `text-embedding-3-small` GlobalStandard-SKU:lla näkyi tilassa *Succeeded*, mutta palautti swedencentralissa 404 `DeploymentNotFound` vielä 20 minuutin jälkeen. Standard-SKU:ta ei ole tarjolla tällä alueella. DataZoneStandard toimi heti ja pitää käsittelyn EU:ssa, mikä on julkisen sektorin datalle muutenkin oikea valinta.
 
 ## Rajoitukset ja jatko
 
 - **Evaluointisetti on LLM:n tuottama.** Se on tarkistettava käsin. Osa kysymyksistä vuotaa tarkkoja yksityiskohtia, kuten päivämääriä ja lukuja, mikä helpottaa hakua. Joukossa on myös kaksi ICT:hen kuulumatonta ilmoitusta (metrojunat, jätehuollon verkkosivut), jotka pääsivät mukaan eriin merkityn CPV 48 -koodin vuoksi.
 - **Agentin evaluointi on pieni** (7 kysymystä), ja agentin käytös vaihtelee ajosta toiseen. Luotettava arvio vaatii useita ajoja ja mediaanin.
-- **Agentti on toteutettu Chat Completions -rajapinnan tool calling -silmukkana.** Seuraava askel on siirtää samat kolme työkalua Foundry Agent Serviceen. Silloin myös tunnistautuminen vaihtuu API-avaimista Entra ID -tunnistautumiseen (managed identity).
+- **Haku ja sopivuusarvio käyttävät yhä API-avaimia.** Agentti tunnistautuu Entra ID:llä, mutta Searchin ja `assess_fit`-mallikutsun avaimet kannattaa vaihtaa managed identityyn, kun sovellus viedään Azureen.
 - **Bicep kattaa Searchin ja embedding-deploymentin.** Sovelluksen hostaus (Container Apps ja Static Web Apps) puuttuu vielä.
 - **Täysi eForms-XML** (osallistumisehdot, vertailuperusteet) parantaisi `assess_fit`-arviota. Sen lukurajapinnan polkua ei vielä löytynyt.
 - **CI** ajaa hakuevaluoinnin oikeaa indeksiä vasten ja kaatuu, jos semantic-haun R@5 laskee alle 0.8. Tämä vaatii GitHub-secretit `FOUNDRY_ENDPOINT`, `FOUNDRY_API_KEY`, `SEARCH_ENDPOINT` ja `SEARCH_API_KEY`.

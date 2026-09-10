@@ -4,8 +4,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import os
+
 from . import agent
 from .search import get_notice, search_notices
+
+# AGENT_BACKEND=foundry (default): Foundry Agent Service, conversation kept server-side.
+# AGENT_BACKEND=local: the original Chat Completions loop, kept for comparison in eval.
+USE_FOUNDRY = os.environ.get("AGENT_BACKEND", "foundry") == "foundry"
+if USE_FOUNDRY:
+    from . import foundry_agent
 
 app = FastAPI(title="Tarjouspyyntötutka")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -14,11 +22,15 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 class Ask(BaseModel):
     question: str
     history: list[dict] = []
+    conversation_id: str | None = None
 
 
 @app.post("/api/ask")
 def ask(body: Ask):
-    out = agent.run(body.question, body.history)
+    if USE_FOUNDRY:
+        out = foundry_agent.run(body.question, body.conversation_id)
+    else:
+        out = agent.run(body.question, body.history)
     out["notices"] = [n for i in out["sources"][:12] if (n := get_notice(i))]
     for n in out["notices"]:
         n.pop("content", None)

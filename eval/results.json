@@ -2,10 +2,10 @@
  "retrieval": {
   "metrics": {
    "bm25": {
-    "recall@1": 0.6,
+    "recall@1": 0.5666666666666667,
     "recall@5": 0.8,
     "recall@10": 0.8,
-    "mrr@10": 0.6888888888888888
+    "mrr@10": 0.6722222222222222
    },
    "vector": {
     "recall@1": 0.5666666666666667,
@@ -14,10 +14,10 @@
     "mrr@10": 0.6592063492063491
    },
    "hybrid": {
-    "recall@1": 0.6,
+    "recall@1": 0.5666666666666667,
     "recall@5": 0.7666666666666667,
     "recall@10": 0.8,
-    "mrr@10": 0.6825396825396824
+    "mrr@10": 0.6603174603174602
    },
    "semantic": {
     "recall@1": 0.7,
@@ -135,8 +135,8 @@
      "rank": null
     },
     {
-     "q": "SaaS-pohjaista koneoppimisratkaisua reaaliaikaiseen käyttäjäkohtaiseen sisällön suositukseen ja bonustarjontaan kasino- ja vedonlyöntituotteissa, integraatiot, testaus, tuki?",
-     "want": "Machine Learning Models for Personalization",
+     "q": "Haetaanko tarjouspyyntöä digitaalista julkaisujärjestelmää ja palveluja tieteellisten kirjojen ja lehtien avoimeen julkaisemiseen?",
+     "want": "Publishing platform supporting open access publishing of scholarly boo",
      "rank": null
     }
    ]
@@ -152,7 +152,7 @@
   "rows": [
    {
     "question": "Onko viimeisen puolen vuoden aikana tullut Azure-osaamiseen liittyviä kilpailutuksia, joiden arvo on alle 500 000 €?",
-    "cited": 6,
+    "cited": 2,
     "cited_exist": true,
     "cited_from_tools": true,
     "expected_hit": true,
@@ -179,7 +179,7 @@
    },
    {
     "question": "Onko hyvinvointialueilta tullut tietojärjestelmähankintoja viime kuukausina?",
-    "cited": 7,
+    "cited": 8,
     "cited_exist": true,
     "cited_from_tools": true,
     "expected_hit": null,
@@ -213,6 +213,7 @@
     "constraint_ok": true,
     "violations": []
    }
-  ]
+  ],
+  "backend": "foundry"
  }
 }
