@@ -1,0 +1,15 @@
+[project]
+name = "hilma-tutka"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "azure-identity>=1.25.3",
+    "azure-search-documents>=12.0.0",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "lxml>=6.1.3",
+    "openai>=3.11.0",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "uvicorn>=0.52.4",
+]

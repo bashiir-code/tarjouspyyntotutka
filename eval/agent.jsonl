@@ -1,0 +1,7 @@
+{"question": "Onko viimeisen puolen vuoden aikana tullut Azure-osaamiseen liittyviä kilpailutuksia, joiden arvo on alle 500 000 €?", "expect_any": ["51004", "52084"]}
+{"question": "Mitkä ohjelmistokehityksen tarjouspyynnöt ovat vielä auki?"}
+{"question": "Löytyykö testausautomaation tai laadunvarmistuksen kilpailutuksia?"}
+{"question": "Onko hyvinvointialueilta tullut tietojärjestelmähankintoja viime kuukausina?"}
+{"question": "Etsi Power BI- tai raportointipalveluihin liittyviä hankintoja."}
+{"question": "Onko tullut kvanttitietokoneiden ohjelmointiin liittyviä kilpailutuksia, joiden arvo on alle 5 000 €?", "max_value": 5000}
+{"question": "Löytyykö Azure- tai pilvipalveluhankintoja, joiden arvo on alle 100 000 €?", "max_value": 100000}

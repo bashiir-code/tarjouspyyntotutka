@@ -1,0 +1,218 @@
+{
+ "retrieval": {
+  "metrics": {
+   "bm25": {
+    "recall@1": 0.6,
+    "recall@5": 0.8,
+    "recall@10": 0.8,
+    "mrr@10": 0.6888888888888888
+   },
+   "vector": {
+    "recall@1": 0.5666666666666667,
+    "recall@5": 0.8,
+    "recall@10": 0.8666666666666667,
+    "mrr@10": 0.6592063492063491
+   },
+   "hybrid": {
+    "recall@1": 0.6,
+    "recall@5": 0.7666666666666667,
+    "recall@10": 0.8,
+    "mrr@10": 0.6825396825396824
+   },
+   "semantic": {
+    "recall@1": 0.7,
+    "recall@5": 0.9333333333333333,
+    "recall@10": 0.9333333333333333,
+    "mrr@10": 0.8055555555555555
+   }
+  },
+  "misses": {
+   "bm25": [
+    {
+     "q": "Missä hankinnassa haetaan SaaS-pohjaista järjestelmää sijaisvälitykseen, mukana tuki, ylläpito ja integraatiot?",
+     "want": "Sijaisvälitysjärjestelmä",
+     "rank": null
+    },
+    {
+     "q": "Tarvitaanko kahteen tilaan toimitettava kosketusvuorovaikutuksellinen ohjaus- ja hallintajärjestelmä sekä toimitus ja koulutus?",
+     "want": "Immersive space control system with touch functionality",
+     "rank": null
+    },
+    {
+     "q": "Etsitkö ilmoitusta Gitlabin käyttöoikeuksien hankinnasta ja hintalomakkeesta?",
+     "want": "Gitlab-lisenssit",
+     "rank": null
+    },
+    {
+     "q": "Haetaanko tarjouspyyntöä digitaalista julkaisujärjestelmää ja palveluja tieteellisten kirjojen ja lehtien avoimeen julkaisemiseen?",
+     "want": "Publishing platform supporting open access publishing of scholarly boo",
+     "rank": null
+    },
+    {
+     "q": "SaaS-pohjaista koneoppimisratkaisua reaaliaikaiseen käyttäjäkohtaiseen sisällön suositukseen ja bonustarjontaan kasino- ja vedonlyöntituotteissa, integraatiot, testaus, tuki?",
+     "want": "Machine Learning Models for Personalization",
+     "rank": null
+    },
+    {
+     "q": "Haetaanko SaaS-ratkaisua avoimiin pankkitietoihin asiakkaan tunnistukseen ja rahanpesun estoon integraatioineen?",
+     "want": "Open Banking for KYC and AML",
+     "rank": null
+    }
+   ],
+   "vector": [
+    {
+     "q": "Etsin hankintailmoitusta yhden toimittajan puitejärjestelystä tilojen valvontakameroille, sopimus 4 vuotta + kaksi vuoden optiota",
+     "want": "Lapin hyvinvointialueen kameravalvontajärjestelmä",
+     "rank": null
+    },
+    {
+     "q": "Tarvitaanko kahteen tilaan toimitettava kosketusvuorovaikutuksellinen ohjaus- ja hallintajärjestelmä sekä toimitus ja koulutus?",
+     "want": "Immersive space control system with touch functionality",
+     "rank": 10
+    },
+    {
+     "q": "Onko julkaistu tarjouspyyntö, jossa kunta hakee selainpohjaista SaaS-asiankäsittelyjärjestelmää kokousaineisto-, sähköisen kokouksen ja sopimushallinnan tarpeisiin, sisältäen tietojen siirron?",
+     "want": "Lapuan kaupungin asianhallintajärjestelmän kilpailutus",
+     "rank": 7
+    },
+    {
+     "q": "Etsi tarjouspyyntö asiantuntijapalvelusta, joka laatii metsätiedon XML/GeoJSON/GeoPackage- ja JSON-skeemoja ja vastaa seuraavana työpäivänä",
+     "want": "Konsultaatio metsätietostandardin skeemojen tuottamiseksi",
+     "rank": null
+    },
+    {
+     "q": "SaaS-pohjaista koneoppimisratkaisua reaaliaikaiseen käyttäjäkohtaiseen sisällön suositukseen ja bonustarjontaan kasino- ja vedonlyöntituotteissa, integraatiot, testaus, tuki?",
+     "want": "Machine Learning Models for Personalization",
+     "rank": null
+    },
+    {
+     "q": "Onko haettavissa julkinen hanke: SaaS-pohjainen talousjärjestelmä kulujen automatisointiin, raportointi, yhteentoimivuus, pitkä elinkaari?",
+     "want": "Talouden järjestelmäkokonaisuus Maatalousyrittäjien eläkelaitokselle",
+     "rank": null
+    }
+   ],
+   "hybrid": [
+    {
+     "q": "Etsin hankintailmoitusta yhden toimittajan puitejärjestelystä tilojen valvontakameroille, sopimus 4 vuotta + kaksi vuoden optiota",
+     "want": "Lapin hyvinvointialueen kameravalvontajärjestelmä",
+     "rank": null
+    },
+    {
+     "q": "Missä hankinnassa haetaan SaaS-pohjaista järjestelmää sijaisvälitykseen, mukana tuki, ylläpito ja integraatiot?",
+     "want": "Sijaisvälitysjärjestelmä",
+     "rank": 7
+    },
+    {
+     "q": "Tarvitaanko kahteen tilaan toimitettava kosketusvuorovaikutuksellinen ohjaus- ja hallintajärjestelmä sekä toimitus ja koulutus?",
+     "want": "Immersive space control system with touch functionality",
+     "rank": null
+    },
+    {
+     "q": "Etsitkö ilmoitusta Gitlabin käyttöoikeuksien hankinnasta ja hintalomakkeesta?",
+     "want": "Gitlab-lisenssit",
+     "rank": null
+    },
+    {
+     "q": "Haetaanko tarjouspyyntöä digitaalista julkaisujärjestelmää ja palveluja tieteellisten kirjojen ja lehtien avoimeen julkaisemiseen?",
+     "want": "Publishing platform supporting open access publishing of scholarly boo",
+     "rank": null
+    },
+    {
+     "q": "SaaS-pohjaista koneoppimisratkaisua reaaliaikaiseen käyttäjäkohtaiseen sisällön suositukseen ja bonustarjontaan kasino- ja vedonlyöntituotteissa, integraatiot, testaus, tuki?",
+     "want": "Machine Learning Models for Personalization",
+     "rank": null
+    },
+    {
+     "q": "Haetaanko SaaS-ratkaisua avoimiin pankkitietoihin asiakkaan tunnistukseen ja rahanpesun estoon integraatioineen?",
+     "want": "Open Banking for KYC and AML",
+     "rank": null
+    }
+   ],
+   "semantic": [
+    {
+     "q": "Tarvitaanko kahteen tilaan toimitettava kosketusvuorovaikutuksellinen ohjaus- ja hallintajärjestelmä sekä toimitus ja koulutus?",
+     "want": "Immersive space control system with touch functionality",
+     "rank": null
+    },
+    {
+     "q": "SaaS-pohjaista koneoppimisratkaisua reaaliaikaiseen käyttäjäkohtaiseen sisällön suositukseen ja bonustarjontaan kasino- ja vedonlyöntituotteissa, integraatiot, testaus, tuki?",
+     "want": "Machine Learning Models for Personalization",
+     "rank": null
+    }
+   ]
+  }
+ },
+ "agent": {
+  "summary": {
+   "answers_with_citations": 0.8571428571428571,
+   "citation_validity": 1.0,
+   "expected_notice_cited": 1.0,
+   "respects_value_limit": 1.0
+  },
+  "rows": [
+   {
+    "question": "Onko viimeisen puolen vuoden aikana tullut Azure-osaamiseen liittyviä kilpailutuksia, joiden arvo on alle 500 000 €?",
+    "cited": 6,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": true,
+    "constraint_ok": null,
+    "violations": null
+   },
+   {
+    "question": "Mitkä ohjelmistokehityksen tarjouspyynnöt ovat vielä auki?",
+    "cited": 7,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": null,
+    "violations": null
+   },
+   {
+    "question": "Löytyykö testausautomaation tai laadunvarmistuksen kilpailutuksia?",
+    "cited": 6,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": null,
+    "violations": null
+   },
+   {
+    "question": "Onko hyvinvointialueilta tullut tietojärjestelmähankintoja viime kuukausina?",
+    "cited": 7,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": null,
+    "violations": null
+   },
+   {
+    "question": "Etsi Power BI- tai raportointipalveluihin liittyviä hankintoja.",
+    "cited": 8,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": null,
+    "violations": null
+   },
+   {
+    "question": "Onko tullut kvanttitietokoneiden ohjelmointiin liittyviä kilpailutuksia, joiden arvo on alle 5 000 €?",
+    "cited": 0,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": true,
+    "violations": []
+   },
+   {
+    "question": "Löytyykö Azure- tai pilvipalveluhankintoja, joiden arvo on alle 100 000 €?",
+    "cited": 5,
+    "cited_exist": true,
+    "cited_from_tools": true,
+    "expected_hit": null,
+    "constraint_ok": true,
+    "violations": []
+   }
+  ]
+ }
+}
