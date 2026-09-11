@@ -2,7 +2,8 @@
 
 import json
 import re
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from openai import AzureOpenAI
@@ -118,13 +119,36 @@ def extract_constraints(question: str) -> dict:
     return {k: raw[k] for k in CONSTRAINT_KEYS if raw.get(k) is not None}
 
 
+HELSINKI = ZoneInfo("Europe/Helsinki")
+DATE_FIELDS = ("deadline", "published")
+
+
+def _fi_date(value: str) -> str:
+    """'2026-08-31T09:00:00Z' -> '31.8.2026 klo 12.00' (Finnish format, Helsinki time)."""
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(HELSINKI)
+    except (ValueError, AttributeError):
+        return value
+    return f"{dt.day}.{dt.month}.{dt.year} klo {dt:%H.%M}"
+
+
+def _format_dates(result):
+    # The model copies dates verbatim from tool output, so format them here instead of asking the
+    # prompt to convert UTC ISO strings (it didn't, reliably: the demo showed raw '...T09:00:00Z').
+    if isinstance(result, list):
+        return [_format_dates(r) for r in result]
+    if isinstance(result, dict):
+        return {k: _fi_date(v) if k in DATE_FIELDS and isinstance(v, str) else v for k, v in result.items()}
+    return result
+
+
 def _call_tool(name: str, args: dict, constraints: dict):
     if name == "search_notices":
         args = {**args, **constraints}  # user's limits win over whatever the model passed
         # 1.8: in eval, off-topic queries topped out at 1.47 and true known-item hits bottomed at 2.13
-        return search_notices(mode="semantic", min_score=1.8, **args)
+        return _format_dates(search_notices(mode="semantic", min_score=1.8, **args))
     if name == "get_notice":
-        return get_notice(args["id"]) or {"error": "not found"}
+        return _format_dates(get_notice(args["id"]) or {"error": "not found"})
     if name == "assess_fit":
         return assess_fit(args["id"])
     return {"error": f"unknown tool {name}"}
