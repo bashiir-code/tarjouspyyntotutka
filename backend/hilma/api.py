@@ -1,7 +1,10 @@
 """FastAPI backend: /api/ask for the agent, /api/notices/{id} for detail view."""
 
-from fastapi import FastAPI, HTTPException
+import logging
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 import os
@@ -17,6 +20,14 @@ if USE_FOUNDRY:
 
 app = FastAPI(title="Tarjouspyyntötutka")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+
+@app.exception_handler(Exception)
+async def upstream_error(_: Request, exc: Exception):
+    # Almost every failure here is a downstream Azure dependency (Search, model, agent). Return 502 with
+    # the reason so the UI can show it, instead of a bare 500.
+    logging.exception("request failed")
+    return JSONResponse(status_code=502, content={"detail": f"{type(exc).__name__}: {str(exc)[:300]}"})
 
 
 class Ask(BaseModel):
