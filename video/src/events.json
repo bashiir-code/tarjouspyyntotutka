@@ -1,0 +1,50 @@
+[
+  {
+    "name": "loaded",
+    "ms": 1824
+  },
+  {
+    "name": "type1",
+    "ms": 3881
+  },
+  {
+    "name": "sent1",
+    "ms": 13441
+  },
+  {
+    "name": "answer1",
+    "ms": 81656
+  },
+  {
+    "name": "read1",
+    "ms": 87888
+  },
+  {
+    "name": "done1",
+    "ms": 89602
+  },
+  {
+    "name": "type2",
+    "ms": 90146
+  },
+  {
+    "name": "sent2",
+    "ms": 94389
+  },
+  {
+    "name": "answer2",
+    "ms": 122233
+  },
+  {
+    "name": "read2",
+    "ms": 126727
+  },
+  {
+    "name": "done2",
+    "ms": 128391
+  },
+  {
+    "name": "end",
+    "ms": 129193
+  }
+]

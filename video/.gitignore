@@ -1,0 +1,4 @@
+node_modules/
+out/
+# Raw screen recordings (regenerate with record.cjs)
+public/session.*

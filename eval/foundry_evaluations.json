@@ -1,0 +1,84 @@
+[
+ {
+  "eval": "eval-t4rmtgl1",
+  "created": "2026-08-16T21:05",
+  "scenario": "synthetic_data_gen_preview",
+  "criteria": [
+   {
+    "name": "Coherence",
+    "evaluator": "builtin.coherence",
+    "judge": "gpt-5-mini",
+    "threshold": 3
+   },
+   {
+    "name": "Fluency",
+    "evaluator": "builtin.fluency",
+    "judge": "gpt-5-mini",
+    "threshold": 3
+   },
+   {
+    "name": "Groundedness",
+    "evaluator": "builtin.groundedness",
+    "judge": "gpt-5-mini",
+    "threshold": 3
+   },
+   {
+    "name": "ProtectedMaterial",
+    "evaluator": "builtin.protected_material",
+    "judge": null,
+    "threshold": null
+   }
+  ],
+  "runs": [
+   {
+    "name": "gpt-5-mini",
+    "status": "completed",
+    "target": {
+     "type": "azure_ai_model",
+     "model": "gpt-5-mini",
+     "sampling_params": {
+      "top_p": 1.0,
+      "max_completion_tokens": 16384
+     }
+    },
+    "result_counts": {
+     "total": 45,
+     "passed": 45,
+     "failed": 0,
+     "errored": 0,
+     "skipped": 0
+    },
+    "per_criteria": [
+     {
+      "testing_criteria": "Coherence",
+      "passed": 45,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+     },
+     {
+      "testing_criteria": "Fluency",
+      "passed": 45,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+     },
+     {
+      "testing_criteria": "Groundedness",
+      "passed": 45,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+     },
+     {
+      "testing_criteria": "ProtectedMaterial",
+      "passed": 45,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0
+     }
+    ]
+   }
+  ]
+ }
+]
